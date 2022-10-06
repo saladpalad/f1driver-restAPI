@@ -1,51 +1,71 @@
-import { v4 as uuidv4 } from 'uuid';
-let drivers = []
-uuidv4();
+const Driver = require('../models/driver.js')
 
-export const getAllDrivers = (req, res) => {
-    res.send(drivers)
+exports.getAllDrivers = async (req, res) => {
+    try{
+        const drivers = await Driver.find()
+        res.json(drivers)
+    }catch (err) {
+        res.status(500).json({ message: err.message})
+    }
 }
 
-export const createDriver = (req, res) => {
-    const driver = req.body
-
-    drivers.push({ ...driver, id: uuidv4()})
-
-    res.send(`Driver with the name ${driver.firstName} added to the database!`)
+exports.createDriver = async (req, res) => {
+    const driver = new Driver({
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        age: req.body.age,
+        constructorTeam: req.body.constructorTeam,
+        driverStanding2022: req.body.driverStanding2022
+    })
+    try{
+        const newDriver = await driver.save()
+        res.status(201).json(newDriver)
+    } catch (err) {
+        res.status(400).json({ message: err.message})
+    }
 }
 
-export const getDriver = (req, res) => {
-    const {id} =  req.params
-
-    const foundDriver = drivers.find((driver) => driver.id == id)
-
-    res.send(foundDriver)
+exports.getDriver = async (req, res, next) => {
+    let driver
+    try{
+        driver  = await Driver.findById(req.params.id)
+        if(driver == null){
+            return res.status(404).json({ message: 'Cannot find F1 Driver' })
+        }
+    }catch (err){
+        return res.status(500).json({ message: err.message })
+    }
+    res.driver = driver
+    next()
 }
 
-export const deleteDriver = (req, res) => {
-    const {id} = req.params
-
-    drivers = drivers.filter((driver) => driver.id != id)
-
-    res.send(`Driver with the id: ${id} has been deleted from the database!`)
+exports.deleteDriver = async (req, res) => {
+   try{
+    await res.driver.remove()
+    res.json({message: `Deleted ${res.driver.firstName} from the database`})
+   }catch (err){
+    res.status(500).json({message: err.message})
+   }
 }
 
-export const updateDriver = (req, res) => {
-    const {id} = req.params
-    const { firstName, lastName, age, constructorId, driverStanding2022} = req.body
-    const updatedDriver = drivers.find((driver) => driver.id == id)
+exports.updateDriver = async (req, res) => {
+    if(req.body.firstName != null) res.driver.firstName = req.body.firstName
+
+    if(req.body.lastName != null) res.driver.lastName = req.body.lastName
+
+    if(req.body.age != null) res.driver.age = req.body.age
+
+    if(req.body.constructorTeam != null) res.driver.constructorTeam = req.body.constructorTeam
+
+    if(req.body.driverStanding2022 != null) res.driver.driverStanding2022 = req.body.driverStanding2022
+
+    try{
+        const updatedDriver = await res.driver.save()
+        res.json(updatedDriver)
+    } catch (err){
+        res.status(400).json({ message: err.message })
+    }
 
 
-    if(firstName) updatedDriver.firstName = firstName
-
-    if(lastName) updatedDriver.lastName = lastName
-
-    if(age) updatedDriver.age = age
-
-    if(constructorId) updatedDriver.constructor = constructor
-
-    if(driverStanding2022) updatedDriver.driverStanding2022 = driverStanding2022
-
-    res.send(`Driver with the id: ${id} has been updated!`)
 
 }

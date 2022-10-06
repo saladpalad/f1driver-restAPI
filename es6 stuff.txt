@@ -1,0 +1,14 @@
+import driver from '../models/driver.js'
+
+import { createDriver, deleteDriver, getAllDrivers, getDriver, updateDriver } from '../controllers/drivers.js'
+
+export default mongoose.model('Driver', driverSchema)
+
+import mongoose from 'mongoose'
+
+import driversRoutes from './routes/drivers.js'
+import express from 'express'
+import bodyParser from 'body-parser'
+import mongoose from 'mongoose'
+import * as dotenv from 'dotenv'
+dotenv.config()

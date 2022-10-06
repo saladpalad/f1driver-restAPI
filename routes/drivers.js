@@ -1,5 +1,6 @@
-import express from 'express'
-import { createDriver, deleteDriver, getAllDrivers, getDriver, updateDriver } from '../controllers/drivers.js'
+const express = require('express')
+
+const {createDriver, deleteDriver, getAllDrivers, getDriver, updateDriver} = require('../controllers/drivers.js')
 
 const router = express.Router()
 
@@ -7,10 +8,12 @@ router.get('/', getAllDrivers)
 
 router.post('/', createDriver)
 
-router.get('/:id', getDriver)
+router.get('/:id', getDriver, (req, res) => {
+    res.send(res.driver)
+})
 
-router.delete('/:id', deleteDriver) 
+router.delete('/:id', getDriver, deleteDriver) 
 
-router.patch('/:id', updateDriver)
+router.patch('/:id', getDriver, updateDriver)
 
-export default router;
+module.exports = router;
