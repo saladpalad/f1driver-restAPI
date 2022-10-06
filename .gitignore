@@ -1,4 +1,4 @@
-node_modules
+node_modules/
 .env
 route.rest
-es6 stuff
+es6 stuff.txt
